@@ -60,9 +60,9 @@ export const GRAPHS: Record<PatternId, GraphDef> = {
     ],
     edges: [
       { from: "in", to: "sup" },
-      { from: "sup", to: "w1", dashed: true, bidir: true },
-      { from: "sup", to: "w2", dashed: true, bidir: true },
-      { from: "sup", to: "w3", dashed: true, bidir: true },
+      { from: "sup", to: "w1", dashed: true },
+      { from: "sup", to: "w2", dashed: true },
+      { from: "sup", to: "w3", dashed: true },
       { from: "w1", to: "out" },
       { from: "w2", to: "out" },
       { from: "w3", to: "out" },
@@ -132,12 +132,12 @@ export const GRAPHS: Record<PatternId, GraphDef> = {
       { id: "out", label: "Top Synthesis", kind: "merge", col: 4, row: 1.5 },
     ],
     edges: [
-      { from: "exec", to: "tech", dashed: true, bidir: true },
-      { from: "exec", to: "deliv", dashed: true, bidir: true },
-      { from: "tech", to: "sec", bidir: true },
-      { from: "tech", to: "arch", bidir: true },
-      { from: "deliv", to: "risk", bidir: true },
-      { from: "deliv", to: "dep", bidir: true },
+      { from: "exec", to: "tech", dashed: true },
+      { from: "exec", to: "deliv", dashed: true },
+      { from: "tech", to: "sec" },
+      { from: "tech", to: "arch" },
+      { from: "deliv", to: "risk" },
+      { from: "deliv", to: "dep" },
       { from: "sec", to: "out" },
       { from: "arch", to: "out" },
       { from: "risk", to: "out" },
@@ -148,14 +148,14 @@ export const GRAPHS: Record<PatternId, GraphDef> = {
 
   // 6 — Consensus / Debate
   consensus: {
-    cols: 5, rows: 3,
+    cols: 5, rows: 2.4,
     nodes: [
-      { id: "in", label: "Question", kind: "io", col: 1, row: 1 },
-      { id: "prop", label: "Proposer", kind: "agent", col: 2, row: 1 },
+      { id: "in", label: "Question", kind: "io", col: 1, row: 0.7 },
+      { id: "prop", label: "Proposer", kind: "agent", col: 2, row: 0.7 },
       { id: "r1", label: "Reviewer 1", kind: "agent", col: 3, row: 0 },
-      { id: "r2", label: "Reviewer 2", kind: "agent", col: 3, row: 2 },
-      { id: "syn", label: "Consensus", kind: "merge", col: 4, row: 1 },
-      { id: "human", label: "Human", kind: "human", col: 5, row: 1 },
+      { id: "r2", label: "Reviewer 2", kind: "agent", col: 3, row: 1.4 },
+      { id: "syn", label: "Consensus", kind: "merge", col: 4, row: 0.7 },
+      { id: "human", label: "Human", kind: "human", col: 5, row: 0.7 },
     ],
     edges: [
       { from: "in", to: "prop" },
@@ -181,7 +181,7 @@ export const GRAPHS: Record<PatternId, GraphDef> = {
       { id: "sys", label: "System update", kind: "system", col: 6, row: 1 },
     ],
     edges: [
-      { from: "sup", to: "spec", dashed: true, bidir: true },
+      { from: "sup", to: "spec", dashed: true },
       { from: "spec", to: "p1" },
       { from: "spec", to: "p2" },
       { from: "p1", to: "cons" },

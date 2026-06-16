@@ -25,8 +25,8 @@ const RUN_GRAPHS: Record<RunPattern, GraphDef> = {
     ],
     edges: [
       { from: "in", to: "sup" },
-      { from: "sup", to: "a1", dashed: true, bidir: true }, { from: "sup", to: "a2", dashed: true, bidir: true },
-      { from: "sup", to: "a3", dashed: true, bidir: true }, { from: "sup", to: "a4", dashed: true, bidir: true },
+      { from: "sup", to: "a1", dashed: true }, { from: "sup", to: "a2", dashed: true },
+      { from: "sup", to: "a3", dashed: true }, { from: "sup", to: "a4", dashed: true },
       { from: "a1", to: "out" }, { from: "a2", to: "out" }, { from: "a3", to: "out" }, { from: "a4", to: "out" },
     ],
     play: [],
