@@ -37,10 +37,11 @@ export function AgentGraph({
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="w-full" style={{ minWidth: Math.min(width, 680) }}>
       <defs>
-        <marker id="ag-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        {/* auto-start-reverse lets one marker serve both ends of a bidir edge */}
+        <marker id="ag-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#6b7280" />
         </marker>
-        <marker id="ag-arr-act" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+        <marker id="ag-arr-act" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#34d399" />
         </marker>
       </defs>
@@ -51,37 +52,40 @@ export function AgentGraph({
         const to = graph.nodes.find((n) => n.id === e.to)!;
         const a = pos(from.col, from.row);
         const b = pos(to.col, to.row);
-        const fromActive = done.has(e.from) || active.has(e.from);
+        const fromTouched = done.has(e.from) || active.has(e.from);
         const toTouched = done.has(e.to) || active.has(e.to);
-        const isActive = fromActive && toTouched && !e.back;
+        const isActive = e.bidir ? (fromTouched && toTouched) : (fromTouched && toTouched && !e.back);
 
-        // Back edges bow downward slightly; forward diagonals curve.
         const sameRow = Math.abs(a.y - b.y) < 2;
-        let x1 = a.x, y1 = a.y, x2 = b.x, y2 = b.y, d: string;
+        // Connect at node sides; left-to-right by column.
+        const leftIsA = from.col <= to.col;
+        const ax = a.x + (leftIsA ? NODE_W / 2 : -NODE_W / 2);
+        const bx = b.x + (leftIsA ? -NODE_W / 2 : NODE_W / 2);
+
+        let d: string;
         if (e.back) {
-          // route under
-          x1 = a.x; y1 = a.y + NODE_H / 2; x2 = b.x; y2 = b.y + NODE_H / 2;
+          // legacy: bow under
           const dip = 22;
-          d = `M ${x1} ${y1} C ${x1} ${y1 + dip}, ${x2} ${y2 + dip}, ${x2} ${y2}`;
+          d = `M ${a.x} ${a.y + NODE_H / 2} C ${a.x} ${a.y + NODE_H / 2 + dip}, ${b.x} ${b.y + NODE_H / 2 + dip}, ${b.x} ${b.y + NODE_H / 2}`;
         } else if (sameRow) {
-          x1 = a.x + NODE_W / 2; x2 = b.x - NODE_W / 2;
-          d = `M ${x1} ${a.y} L ${x2} ${b.y}`;
+          d = `M ${ax} ${a.y} L ${bx} ${b.y}`;
         } else {
-          x1 = a.x + NODE_W / 2; x2 = b.x - NODE_W / 2;
-          const mx = (x1 + x2) / 2;
-          d = `M ${x1} ${a.y} C ${mx} ${a.y}, ${mx} ${b.y}, ${x2} ${b.y}`;
+          const mx = (ax + bx) / 2;
+          d = `M ${ax} ${a.y} C ${mx} ${a.y}, ${mx} ${b.y}, ${bx} ${b.y}`;
         }
 
+        const stroke = isActive ? "#34d399" : "#3a4150";
+        const marker = isActive ? "url(#ag-arr-act)" : "url(#ag-arr)";
         return (
           <path
             key={i}
             d={d}
             fill="none"
-            stroke={isActive ? "#34d399" : e.back ? "#4b5563" : "#374151"}
-            strokeWidth={isActive ? 2 : 1.3}
+            stroke={stroke}
+            strokeWidth={isActive ? 2 : 1.4}
             strokeDasharray={e.dashed ? "5 4" : undefined}
-            markerEnd={isActive ? "url(#ag-arr-act)" : "url(#ag-arr)"}
-            opacity={e.back ? 0.7 : 1}
+            markerEnd={marker}
+            markerStart={e.bidir ? marker : undefined}
           />
         );
       })}

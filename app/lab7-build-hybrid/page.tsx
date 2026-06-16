@@ -31,8 +31,7 @@ function compose(on: Set<BlockId>): GraphDef {
   }
   if (on.has("specialists")) {
     nodes.push({ id: "spec", label: "Specialist tools", kind: "tool", col, row: 1.5 });
-    edges.push({ from: last, to: "spec", dashed: true });
-    edges.push({ from: "spec", to: last, back: true });
+    edges.push({ from: last, to: "spec", dashed: true, bidir: true });
     last = "spec"; col++;
   }
   if (on.has("parallel")) {

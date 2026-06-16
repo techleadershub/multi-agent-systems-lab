@@ -15,7 +15,8 @@ export type GEdge = {
   from: string;
   to: string;
   dashed?: boolean;   // conditional edge
-  back?: boolean;     // return edge (worker → supervisor)
+  back?: boolean;     // return edge (worker → supervisor) — legacy, prefer bidir
+  bidir?: boolean;    // call-and-return: one line, arrowheads both ends
 };
 
 export type GraphDef = {
@@ -31,18 +32,17 @@ export type GraphDef = {
 export const GRAPHS: Record<PatternId, GraphDef> = {
   // 1 — Single agent + tools (agent ⇄ tools loop)
   single: {
-    cols: 4, rows: 1,
+    cols: 4, rows: 2,
     nodes: [
       { id: "in", label: "Event", kind: "io", col: 1, row: 0 },
       { id: "agent", label: "Agent", kind: "agent", col: 2, row: 0 },
-      { id: "tools", label: "Tools", kind: "tool", col: 3, row: 0 },
+      { id: "tools", label: "Tools", kind: "tool", col: 3, row: 1 },
       { id: "out", label: "Answer", kind: "io", col: 4, row: 0 },
     ],
     edges: [
       { from: "in", to: "agent" },
-      { from: "agent", to: "tools", dashed: true },
-      { from: "tools", to: "agent", back: true },
-      { from: "agent", to: "out", dashed: true },
+      { from: "agent", to: "tools", dashed: true, bidir: true },
+      { from: "agent", to: "out" },
     ],
     play: ["in", "agent", "tools", "agent", "out"],
   },
@@ -60,13 +60,12 @@ export const GRAPHS: Record<PatternId, GraphDef> = {
     ],
     edges: [
       { from: "in", to: "sup" },
-      { from: "sup", to: "w1", dashed: true },
-      { from: "sup", to: "w2", dashed: true },
-      { from: "sup", to: "w3", dashed: true },
-      { from: "w1", to: "sup", back: true },
-      { from: "w2", to: "sup", back: true },
-      { from: "w3", to: "sup", back: true },
-      { from: "sup", to: "out" },
+      { from: "sup", to: "w1", dashed: true, bidir: true },
+      { from: "sup", to: "w2", dashed: true, bidir: true },
+      { from: "sup", to: "w3", dashed: true, bidir: true },
+      { from: "w1", to: "out" },
+      { from: "w2", to: "out" },
+      { from: "w3", to: "out" },
     ],
     play: ["in", "sup", "w1", "sup", "w2", "sup", "w3", "sup", "out"],
   },
@@ -83,12 +82,9 @@ export const GRAPHS: Record<PatternId, GraphDef> = {
     ],
     edges: [
       { from: "in", to: "sup" },
-      { from: "sup", to: "t1", dashed: true },
-      { from: "t1", to: "sup", back: true },
-      { from: "sup", to: "t2", dashed: true },
-      { from: "t2", to: "sup", back: true },
-      { from: "sup", to: "t3", dashed: true },
-      { from: "t3", to: "sup", back: true },
+      { from: "sup", to: "t1", dashed: true, bidir: true },
+      { from: "sup", to: "t2", dashed: true, bidir: true },
+      { from: "sup", to: "t3", dashed: true, bidir: true },
     ],
     play: ["in", "sup", "t1", "sup", "t2", "sup", "t3", "sup"],
   },
@@ -136,21 +132,18 @@ export const GRAPHS: Record<PatternId, GraphDef> = {
       { id: "out", label: "Top Synthesis", kind: "merge", col: 4, row: 1.5 },
     ],
     edges: [
-      { from: "exec", to: "tech", dashed: true },
-      { from: "exec", to: "deliv", dashed: true },
-      { from: "tech", to: "sec" },
-      { from: "tech", to: "arch" },
-      { from: "deliv", to: "risk" },
-      { from: "deliv", to: "dep" },
-      { from: "sec", to: "tech", back: true },
-      { from: "arch", to: "tech", back: true },
-      { from: "risk", to: "deliv", back: true },
-      { from: "dep", to: "deliv", back: true },
-      { from: "tech", to: "exec", back: true },
-      { from: "deliv", to: "exec", back: true },
-      { from: "exec", to: "out" },
+      { from: "exec", to: "tech", dashed: true, bidir: true },
+      { from: "exec", to: "deliv", dashed: true, bidir: true },
+      { from: "tech", to: "sec", bidir: true },
+      { from: "tech", to: "arch", bidir: true },
+      { from: "deliv", to: "risk", bidir: true },
+      { from: "deliv", to: "dep", bidir: true },
+      { from: "sec", to: "out" },
+      { from: "arch", to: "out" },
+      { from: "risk", to: "out" },
+      { from: "dep", to: "out" },
     ],
-    play: ["exec", "tech", ["sec", "arch"], "tech", "exec", "deliv", ["risk", "dep"], "deliv", "exec", "out"],
+    play: ["exec", ["tech", "deliv"], ["sec", "arch", "risk", "dep"], "out"],
   },
 
   // 6 — Consensus / Debate
@@ -188,10 +181,9 @@ export const GRAPHS: Record<PatternId, GraphDef> = {
       { id: "sys", label: "System update", kind: "system", col: 6, row: 1 },
     ],
     edges: [
-      { from: "sup", to: "spec", dashed: true },
-      { from: "spec", to: "sup", back: true },
-      { from: "sup", to: "p1" },
-      { from: "sup", to: "p2" },
+      { from: "sup", to: "spec", dashed: true, bidir: true },
+      { from: "spec", to: "p1" },
+      { from: "spec", to: "p2" },
       { from: "p1", to: "cons" },
       { from: "p2", to: "cons" },
       { from: "cons", to: "human", dashed: true },
